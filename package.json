@@ -1,0 +1,26 @@
+{
+  "name": "allpay",
+  "version": "0.0.0",
+  "description": "AllPay API",
+  "main": "index.js",
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/starsirius/allpay.git"
+  },
+  "keywords": [
+    "AllPay"
+  ],
+  "author": "Chung-Yi Chi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/starsirius/allpay/issues"
+  },
+  "homepage": "https://github.com/starsirius/allpay",
+  "devDependencies": {
+    "mocha": "^1.20.1",
+    "should": "^4.0.4"
+  }
+}
