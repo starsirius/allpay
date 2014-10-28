@@ -2,7 +2,7 @@ var AllPay = require('../index');
 
 describe('#genCheckMacValue', function() {
   it('generates correct Check Mac Value', function() {
-    var allPay = AllPay({
+    var allPay = new AllPay({
       hashKey: 'xdfaefasdfasdfa32d',
       hashIV: 'sdfxfafaeafwexfe'
     }),

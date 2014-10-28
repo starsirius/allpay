@@ -3,31 +3,29 @@ var md5 = require('MD5')
   , HASH_IV = 'v77hoKGq4kWxNNIS'
   , AIO_CHECKOUT_URL = 'http://payment-stage.allpay.com.tw/Cashier/AioCheckOut';
 
-module.exports = function(options) {
-  var hashKey, hashIV, aioCheckoutUrl;
-
+function AllPay(options) {
   if (options == null) {
     options = {};
   }
 
-  hashKey = options.hashKey || HASH_KEY;
-  hashIV = options.hashIV || HASH_IV;
-  aioCheckoutUrl = options.aioCheckoutUrl || AIO_CHECKOUT_URL;
+  this.hashKey = options.hashKey || HASH_KEY;
+  this.hashIV = options.hashIV || HASH_IV;
+  this.aioCheckoutUrl = options.aioCheckoutUrl || AIO_CHECKOUT_URL;
+}
 
-  return {
-    genCheckMacValue: function(data) {
-      pairs = Object
-        .keys(data)
-        .sort()
-        .map(function(v) { return v + "=" + (data[v] || ''); });
+AllPay.prototype.genCheckMacValue = function(data) {
+  var pairs = Object
+    .keys(data)
+    .sort()
+    .map(function(v) { return v + "=" + (data[v] || ''); });
 
-      pairs.unshift("HashKey=" + hashKey);
-      pairs.push("HashIV=" + hashIV);
+  pairs.unshift("HashKey=" + this.hashKey);
+  pairs.push("HashIV=" + this.hashIV);
 
-      queryString = pairs.join("&");
-      uriEncoded = encodeURIComponent(queryString).replace(/%20/g, '+');
+  queryString = pairs.join("&");
+  uriEncoded = encodeURIComponent(queryString).replace(/%20/g, '+');
 
-      return md5(uriEncoded.toLowerCase()).toUpperCase();
-    }
-  };
-};
+  return md5(uriEncoded.toLowerCase()).toUpperCase();
+}
+
+module.exports = AllPay;
