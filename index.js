@@ -1,20 +1,21 @@
-var md5 = require('MD5')
-  , MERCHANT_ID = '2000132'
-  , HASH_KEY = '5294y06JbISpM5x9'
-  , HASH_IV = 'v77hoKGq4kWxNNIS'
-  , AIO_CHECKOUT_URL = 'http://payment-stage.allpay.com.tw/Cashier/AioCheckOut'
-  , AIO_ORDER_QUERY_URL = 'http://payment-stage.allpay.com.tw/Cashier/QueryTradeInfo';
+var _ = require('underscore')
+  , md5 = require('MD5');
 
 function AllPay(options) {
+  var instance = this
+    , defaults = {
+    merchantId: '2000132',
+    hashKey: '5294y06JbISpM5x9',
+    hashIV: 'v77hoKGq4kWxNNIS',
+    aioCheckoutUrl: 'http://payment-stage.allpay.com.tw/Cashier/AioCheckOut',
+    aioOrderQueryUrl: 'http://payment-stage.allpay.com.tw/Cashier/QueryTradeInfo'
+  };
+
   if (options == null) {
     options = {};
   }
 
-  this.merchantId = options.merchantId || MERCHANT_ID;
-  this.hashKey = options.hashKey || HASH_KEY;
-  this.hashIV = options.hashIV || HASH_IV;
-  this.aioCheckoutUrl = options.aioCheckoutUrl || AIO_CHECKOUT_URL;
-  this.aioOrderQueryUrl = options.aioOrderQueryUrl || AIO_ORDER_QUERY_URL;
+  _.each(_.extend(defaults, options), function(v, k) { instance[k] = v; });
 }
 
 AllPay.prototype.genCheckMacValue = function(data) {
