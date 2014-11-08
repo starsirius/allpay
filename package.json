@@ -21,7 +21,8 @@
   "homepage": "https://github.com/starsirius/allpay",
   "devDependencies": {
     "mocha": "^1.20.1",
-    "should": "^4.0.4"
+    "should": "^4.0.4",
+    "underscore": "*"
   },
   "dependencies": {
     "MD5": "^1.2.1"
