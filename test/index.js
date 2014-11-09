@@ -48,3 +48,23 @@ describe('#genCheckMacValue', function() {
     allPay.genCheckMacValue(data).should.equal('40D9A6C00A4A78A300ED458237071BDA');
   });
 });
+
+describe('#createFormHtml', function() {
+  it('generates correct HTML form', function() {
+    var allPay = new AllPay({
+      aioCheckoutUrl: 'http://takoman.co'
+    }),
+    data = {
+      MerchantID: '12345678',
+      TotalAmount: '799',
+      CheckMacValue: '40D9A6C00A4A78A300ED458237071BDA'
+    },
+    expected = '<form id="allpay-checkout" method="post" action="http://takoman.co">' +
+                 '<input type="hidden" name="MerchantID" value="12345678">' +
+                 '<input type="hidden" name="TotalAmount" value="799">' +
+                 '<input type="hidden" name="CheckMacValue" value="40D9A6C00A4A78A300ED458237071BDA">' +
+               '</form>';
+
+    allPay.createFormHtml(data).should.equal(expected);
+  });
+});
