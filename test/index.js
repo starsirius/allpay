@@ -1,4 +1,5 @@
-var AllPay = require('../index');
+var _ = require('underscore')
+  , AllPay = require('../index');
 
 describe('#initialization', function() {
   it('has default attribute values for AllPay testing environment', function() {
@@ -66,5 +67,229 @@ describe('#createFormHtml', function() {
                '</form>';
 
     allPay.createFormHtml(data).should.equal(expected);
+  });
+});
+
+describe('#validateCheckout', function() {
+  var allPay, required;
+
+  beforeEach(function() {
+    allPay = new AllPay();
+    required = {
+      MerchantID: '1234567890',
+      MerchantTradeNo: '1234567890',
+      MerchantTradeDate: '2014/11/10 10:44:29',
+      PaymentType: 'aio',
+      TotalAmount: '3999',
+      TradeDesc: '美國感恩節瘋狂購物',
+      ItemName: '電視 x 20',
+      ReturnURL: 'http://takoman.co',
+      ChoosePayment: 'ALL'
+    };
+  });
+
+  describe('required fields', function() {
+
+    it('requires MerchantID', function() {
+      var result = allPay.validateCheckout(_.omit(required, 'MerchantID'));
+      result.error.should.be.true;
+      result.errors.should.eql(['MerchantID is required']);
+    });
+
+    it('requires MerchantID to be no more than 10 chars', function() {
+      required.MerchantID = '1234567890a';
+      var result = allPay.validateCheckout(required);
+      result.error.should.be.true;
+      result.errors.should.eql(['MerchantID exceeds max length 10']);
+    });
+
+    it('requires MerchantTradeNo');
+    it('requires MerchantTradeNo to be no more than 200 chars');
+
+    it('requires PaymentType');
+    it('requires PaymentType to be "aio"');
+
+    it('requires TotalAmount');
+
+    it('requires TradeDesc');
+    it('requires TradeDesc to be no more than 200 chars');
+
+    it('requires ItemName');
+    it('requires ItemName to be no more than 200 chars');
+
+    it('requires ReturnURL');
+    it('requires ReturnURL to be no more than 200 chars');
+
+    it('requires ChoosePayment');
+    it('requires ChoosePayment to be one of the supported payment moethods');
+
+  });
+
+  describe('payment methods', function() {
+    var allOptions, creditOptions, webAtmOptions, atmOptions, cvsOptions,
+        barcodeOptions, alipayOptions, tenpayOptions, allOptional, allKeys;
+
+    beforeEach(function() {
+      allOptions = {
+        PlatformID: '1234567890',
+        ClientBackURL: 'http://takoman.co/client/back/url',
+        ItemURL: 'http://takoman.co/item/url',
+        Remark: 'Some notes',
+        ChooseSubPayment: '',
+        OrderResultURL: 'http://takoman.co/order/result/url',
+        NeedExtraPaidInfo: 'Y',
+        DeviceSource: 'P',
+        IgnorePayment: ''
+      };
+      creditOptions = {
+        // CREDIT specific (Non-periodic payments)
+        CreditInstallment: '0',
+        InstallmentAmount: '0',
+        Redeem: 'N',
+        UnionPay: '0',
+        // CREDIT specific (Periodic payments)
+        PeriodAmount: '2000',
+        PeriodType: 'M',
+        Frequency: '2',
+        ExecTimes: '12',
+        PeriodReturnURL: 'http://takoman.co/credit/period/return/url'
+      };
+      webAtmOptions= {};
+      atmOptions = {
+        ExpireDate: '7',
+        PaymentInfoURL: 'http://takoman.co/atm/payment/info/url',
+        ClientRedirectURL: 'http://takoman.co/atm/client/redirect/url'
+      };
+      cvsOptions = {
+        Desc_1: 'description 1',
+        Desc_2: 'description 2',
+        Desc_3: 'description 3',
+        Desc_4: 'description 4',
+        PaymentInfoURL: 'http://takoman.co/cvs/payment/info/url',
+        ClientRedirectURL: 'http://takoman.co/cvs/client/redirect/url'
+      };
+      barcodeOptions = {
+        Desc_1: 'description 1',
+        Desc_2: 'description 2',
+        Desc_3: 'description 3',
+        Desc_4: 'description 4',
+        PaymentInfoURL: 'http://takoman.co/barcode/payment/info/url',
+        ClientRedirectURL: 'http://takoman.co/barcode/client/redirect/url'
+      };
+      alipayOptions = {
+        AlipayItemName: '醬油#米酒#冰咖啡',
+        AlipayItemCounts: '3#4#5',
+        AlipayItemPrice: '100#300#25',
+        Email: 'customer@takoman.co',
+        PhoneNo: '4128775750',
+        UserName: '塔克超人'
+      };
+      tenpayOptions = {
+        ExpireTime: '2014/12/10 00:00:01'
+      };
+      allOptional = _.extend({}, allOptions, creditOptions, webAtmOptions,
+        atmOptions, cvsOptions, barcodeOptions, alipayOptions, tenpayOptions);
+      allKeys = [
+        'MerchantID', 'MerchantTradeNo', 'MerchantTradeDate', 'PaymentType',
+        'TotalAmount', 'TradeDesc', 'ItemName', 'ReturnURL', 'ChoosePayment',
+        'PlatformID', 'ClientBackURL', 'ItemURL', 'Remark', 'ChooseSubPayment',
+        'OrderResultURL', 'NeedExtraPaidInfo', 'DeviceSource', 'IgnorePayment',
+        'CreditInstallment', 'InstallmentAmount', 'Redeem', 'UnionPay', 'PeriodAmount',
+        'PeriodType', 'Frequency', 'ExecTimes', 'PeriodReturnURL', 'ExpireDate',
+        'PaymentInfoURL', 'ClientRedirectURL', 'Desc_1', 'Desc_2', 'Desc_3', 'Desc_4',
+        'AlipayItemName', 'AlipayItemCounts', 'AlipayItemPrice', 'Email', 'PhoneNo',
+        'UserName', 'ExpireTime'
+      ];
+    });
+
+    describe('ALL', function() {
+
+      it('keeps all the required fields', function() {
+        var data, results;
+        data = _.extend({}, required, allOptional);
+        results = allPay.validateCheckout(data);
+
+        results.should.containEql(required);
+      });
+
+      it('discards invalid options', function() {
+        var data, optional, results;
+        optional = _.extend(allOptions, { InvalidOption: 'This is wrong' });
+        data = _.extend({}, required, optional);
+        data.should.containEql({ InvalidOption: 'This is wrong' });
+        results = allPay.validateCheckout(data);
+
+        results.should.not.have.keys('InvalidOption');
+      });
+
+      it('keeps all options except options of credit card', function(){
+        var data, results, expected;
+        data = _.extend({}, required, allOptional);
+        expected = _.pick(data,
+          'MerchantID', 'MerchantTradeNo', 'MerchantTradeDate', 'PaymentType',
+          'TotalAmount', 'TradeDesc', 'ItemName', 'ReturnURL', 'ChoosePayment',
+          'PlatformID', 'ClientBackURL', 'ItemURL', 'Remark', 'ChooseSubPayment',
+          'OrderResultURL', 'NeedExtraPaidInfo', 'DeviceSource', 'IgnorePayment',
+          'ExpireDate', 'PaymentInfoURL', 'ClientRedirectURL', 'Desc_1', 'Desc_2',
+          'Desc_3', 'Desc_4', 'AlipayItemName', 'AlipayItemCounts', 'AlipayItemPrice',
+          'Email', 'PhoneNo', 'UserName', 'ExpireTime');
+        results = allPay.validateCheckout(data);
+
+        results.should.eql(expected);
+      });
+
+      it('discards options of ignored payment methods', function() {
+        var data, results, expected;
+        allOptional.IgnorePayment = 'CVS#Alipay#Tenpay#Invalid';
+        data = _.extend({}, required, allOptional);
+        expected = _.pick(data,
+          'MerchantID', 'MerchantTradeNo', 'MerchantTradeDate', 'PaymentType',
+          'TotalAmount', 'TradeDesc', 'ItemName', 'ReturnURL', 'ChoosePayment',
+          'PlatformID', 'ClientBackURL', 'ItemURL', 'Remark', 'ChooseSubPayment',
+          'OrderResultURL', 'NeedExtraPaidInfo', 'DeviceSource', 'IgnorePayment',
+          'ExpireDate', 'PaymentInfoURL', 'ClientRedirectURL', 'Desc_1', 'Desc_2',
+          'Desc_3', 'Desc_4');
+        results = allPay.validateCheckout(data);
+
+        results.should.eql(expected);
+      });
+
+      it('keeps overlapped fields if not all of the payment methods are ignored', function() {
+        var data, results, expected;
+        allOptions.IgnorePayment = 'ATM';
+        allOptional = _.extend({}, allOptions, creditOptions, webAtmOptions,
+          atmOptions, cvsOptions, barcodeOptions, alipayOptions, tenpayOptions);
+        data = _.extend({}, required, allOptional);
+        expected = _.pick(data,
+          'MerchantID', 'MerchantTradeNo', 'MerchantTradeDate', 'PaymentType',
+          'TotalAmount', 'TradeDesc', 'ItemName', 'ReturnURL', 'ChoosePayment',
+          'PlatformID', 'ClientBackURL', 'ItemURL', 'Remark', 'ChooseSubPayment',
+          'OrderResultURL', 'NeedExtraPaidInfo', 'DeviceSource', 'IgnorePayment',
+          'PaymentInfoURL', 'ClientRedirectURL', 'Desc_1', 'Desc_2',
+          'Desc_3', 'Desc_4', 'AlipayItemName', 'AlipayItemCounts', 'AlipayItemPrice',
+          'Email', 'PhoneNo', 'UserName', 'ExpireTime');
+        results = allPay.validateCheckout(data);
+
+        results.should.eql(expected);
+      });
+
+      it('discards ClientRedirectURL option if it is blank', function() {
+        var data, results, expected;
+        allOptional.ClientRedirectURL = '';
+        data = _.extend({}, required, allOptional);
+        expected = _.pick(data,
+          'MerchantID', 'MerchantTradeNo', 'MerchantTradeDate', 'PaymentType',
+          'TotalAmount', 'TradeDesc', 'ItemName', 'ReturnURL', 'ChoosePayment',
+          'PlatformID', 'ClientBackURL', 'ItemURL', 'Remark', 'ChooseSubPayment',
+          'OrderResultURL', 'NeedExtraPaidInfo', 'DeviceSource', 'IgnorePayment',
+          'ExpireDate', 'PaymentInfoURL', 'Desc_1', 'Desc_2',
+          'Desc_3', 'Desc_4', 'AlipayItemName', 'AlipayItemCounts', 'AlipayItemPrice',
+          'Email', 'PhoneNo', 'UserName', 'ExpireTime');
+        results = allPay.validateCheckout(data);
+
+        results.should.eql(expected);
+      });
+
+    });
   });
 });
