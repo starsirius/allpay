@@ -434,7 +434,34 @@ describe('#validateCheckout', function() {
         results.should.containEql(required);
       });
 
-      it('keeps only Web ATM options besides required fields');
+      it('keeps only CVS and ALL options besides required fields and discards IgnorePayment', function() {
+        var data, results, expected;
+        data = _.extend({}, required, allOptional);
+        expected = _.pick(data,
+          'MerchantID', 'MerchantTradeNo', 'MerchantTradeDate', 'PaymentType',
+          'TotalAmount', 'TradeDesc', 'ItemName', 'ReturnURL', 'ChoosePayment',
+          'PlatformID', 'ClientBackURL', 'ItemURL', 'Remark', 'ChooseSubPayment',
+          'OrderResultURL', 'NeedExtraPaidInfo', 'DeviceSource',
+          'Desc_1', 'Desc_2', 'Desc_3', 'Desc_4', 'PaymentInfoURL', 'ClientRedirectURL');
+        results = allPay.validateCheckout(data);
+
+        results.should.eql(expected);
+      });
+
+      it('discards ClientRedirectURL option if it is blank', function() {
+        var data, results, expected;
+        data = _.extend({}, required, allOptional);
+        data.ClientRedirectURL = '';
+        expected = _.pick(data,
+          'MerchantID', 'MerchantTradeNo', 'MerchantTradeDate', 'PaymentType',
+          'TotalAmount', 'TradeDesc', 'ItemName', 'ReturnURL', 'ChoosePayment',
+          'PlatformID', 'ClientBackURL', 'ItemURL', 'Remark', 'ChooseSubPayment',
+          'OrderResultURL', 'NeedExtraPaidInfo', 'DeviceSource',
+          'Desc_1', 'Desc_2', 'Desc_3', 'Desc_4', 'PaymentInfoURL');
+        results = allPay.validateCheckout(data);
+
+        results.should.eql(expected);
+      });
     });
 
     describe('BARCODE', function() {
@@ -450,12 +477,38 @@ describe('#validateCheckout', function() {
         results.should.containEql(required);
       });
 
-      it('keeps only Web ATM options besides required fields');
+      it('keeps only BARCODE and ALL options besides required fields and discards IgnorePayment', function() {
+        var data, results, expected;
+        data = _.extend({}, required, allOptional);
+        expected = _.pick(data,
+          'MerchantID', 'MerchantTradeNo', 'MerchantTradeDate', 'PaymentType',
+          'TotalAmount', 'TradeDesc', 'ItemName', 'ReturnURL', 'ChoosePayment',
+          'PlatformID', 'ClientBackURL', 'ItemURL', 'Remark', 'ChooseSubPayment',
+          'OrderResultURL', 'NeedExtraPaidInfo', 'DeviceSource',
+          'Desc_1', 'Desc_2', 'Desc_3', 'Desc_4', 'PaymentInfoURL', 'ClientRedirectURL');
+        results = allPay.validateCheckout(data);
+
+        results.should.eql(expected);
+      });
+
+      it('discards ClientRedirectURL option if it is blank', function() {
+        var data, results, expected;
+        data = _.extend({}, required, allOptional);
+        data.ClientRedirectURL = '';
+        expected = _.pick(data,
+          'MerchantID', 'MerchantTradeNo', 'MerchantTradeDate', 'PaymentType',
+          'TotalAmount', 'TradeDesc', 'ItemName', 'ReturnURL', 'ChoosePayment',
+          'PlatformID', 'ClientBackURL', 'ItemURL', 'Remark', 'ChooseSubPayment',
+          'OrderResultURL', 'NeedExtraPaidInfo', 'DeviceSource',
+          'Desc_1', 'Desc_2', 'Desc_3', 'Desc_4', 'PaymentInfoURL');
+        results = allPay.validateCheckout(data);
+
+        results.should.eql(expected);
+      });
     });
 
     //describe('Alipay');
     //describe('Tenpay');
     //describe('TopUpUsed');
-
   });
 });

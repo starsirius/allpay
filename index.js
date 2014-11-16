@@ -174,8 +174,16 @@ AllPay.prototype.validateCheckout = function(data) {
       if (data['ClientRedirectURL'] == '') { data = _.omit(data, 'ClientRedirectURL'); }
       break;
     case PAYMENT_METHOD.CVS:
+      data = _.pick(data, _.union(
+        required, optional[PAYMENT_METHOD.ALL], optional[PAYMENT_METHOD.CVS]));
+      data = _.omit(data, 'IgnorePayment');
+      if (data['ClientRedirectURL'] == '') { data = _.omit(data, 'ClientRedirectURL'); }
       break;
     case PAYMENT_METHOD.BARCODE:
+      data = _.pick(data, _.union(
+        required, optional[PAYMENT_METHOD.ALL], optional[PAYMENT_METHOD.BARCODE]));
+      data = _.omit(data, 'IgnorePayment');
+      if (data['ClientRedirectURL'] == '') { data = _.omit(data, 'ClientRedirectURL'); }
       break;
     case PAYMENT_METHOD.ALIPAY:
       break;
