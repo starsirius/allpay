@@ -510,5 +510,19 @@ describe('#validateCheckout', function() {
     //describe('Alipay');
     //describe('Tenpay');
     //describe('TopUpUsed');
+
+    describe('unsupported payment method', function() {
+      beforeEach(function() {
+        required.ChoosePayment = 'P coin';
+      });
+
+      it('returns unsupported errors', function() {
+        var data, results;
+        data = _.extend({}, required);
+
+        results = allPay.validateCheckout(data);
+        results.should.containEql('Payment P coin not supported. Currently support ALL, Credit, WebATM, ATM, CVS, BARCODE, Alipay, Tenpay, TopUpUsed.');
+      });
+    });
   });
 });

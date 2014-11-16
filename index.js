@@ -186,18 +186,15 @@ AllPay.prototype.validateCheckout = function(data) {
       if (data['ClientRedirectURL'] == '') { data = _.omit(data, 'ClientRedirectURL'); }
       break;
     case PAYMENT_METHOD.ALIPAY:
-      break;
     case PAYMENT_METHOD.TENPAY:
-      break;
     case PAYMENT_METHOD.TOP_UP_USED:
-      break;
     default:
       errors.push(
         'Payment ' + data['ChoosePayment'] + ' not supported. ' +
-        'Currently support ' + PAYMENT_METHOD.values().join(', ') + '.'
+        'Currently support ' + _.values(PAYMENT_METHOD).join(', ') + '.'
       );
   }
-  return data;
+  return (errors.length > 0) ? errors : data;
 };
 
 AllPay.prototype.checkoutFormHtml = function(data) {
