@@ -363,7 +363,18 @@ describe('#validateCheckout', function() {
         results.should.containEql(required);
       });
 
-      it('keeps only Web ATM options besides required fields');
+      it('keeps only ALL options besides required fields', function() {
+        var data, results, expected;
+        data = _.extend({}, required, allOptional);
+        expected = _.pick(data,
+          'MerchantID', 'MerchantTradeNo', 'MerchantTradeDate', 'PaymentType',
+          'TotalAmount', 'TradeDesc', 'ItemName', 'ReturnURL', 'ChoosePayment',
+          'PlatformID', 'ClientBackURL', 'ItemURL', 'Remark', 'ChooseSubPayment',
+          'OrderResultURL', 'NeedExtraPaidInfo', 'DeviceSource', 'IgnorePayment');
+        results = allPay.validateCheckout(data);
+
+        results.should.eql(expected);
+      });
     });
 
     describe('ATM', function() {
@@ -379,7 +390,35 @@ describe('#validateCheckout', function() {
         results.should.containEql(required);
       });
 
-      it('keeps only ATM options besides required fields');
+      it('keeps only ATM and ALL options besides required fields and discards IgnorePayment', function() {
+        var data, results, expected;
+        data = _.extend({}, required, allOptional);
+        expected = _.pick(data,
+          'MerchantID', 'MerchantTradeNo', 'MerchantTradeDate', 'PaymentType',
+          'TotalAmount', 'TradeDesc', 'ItemName', 'ReturnURL', 'ChoosePayment',
+          'PlatformID', 'ClientBackURL', 'ItemURL', 'Remark', 'ChooseSubPayment',
+          'OrderResultURL', 'NeedExtraPaidInfo', 'DeviceSource',
+          'ExpireDate', 'PaymentInfoURL', 'ClientRedirectURL');
+        results = allPay.validateCheckout(data);
+
+        results.should.eql(expected);
+      });
+
+      it('discards ClientRedirectURL option if it is blank', function() {
+        var data, results, expected;
+        data = _.extend({}, required, allOptional);
+        data.ClientRedirectURL = '';
+        expected = _.pick(data,
+          'MerchantID', 'MerchantTradeNo', 'MerchantTradeDate', 'PaymentType',
+          'TotalAmount', 'TradeDesc', 'ItemName', 'ReturnURL', 'ChoosePayment',
+          'PlatformID', 'ClientBackURL', 'ItemURL', 'Remark', 'ChooseSubPayment',
+          'OrderResultURL', 'NeedExtraPaidInfo', 'DeviceSource', 
+          'ExpireDate', 'PaymentInfoURL');
+        results = allPay.validateCheckout(data);
+
+        results.should.not.have.keys('ClientRedirectURL');
+        results.should.eql(expected);
+      });
     });
 
     describe('CVS', function() {

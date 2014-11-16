@@ -165,8 +165,13 @@ AllPay.prototype.validateCheckout = function(data) {
       break;
 
     case PAYMENT_METHOD.WEB_ATM:
+      data = _.pick(data, _.union(required, optional[PAYMENT_METHOD.ALL]));
       break;
     case PAYMENT_METHOD.ATM:
+      data = _.pick(data, _.union(
+        required, optional[PAYMENT_METHOD.ALL], optional[PAYMENT_METHOD.ATM]));
+      data = _.omit(data, 'IgnorePayment');
+      if (data['ClientRedirectURL'] == '') { data = _.omit(data, 'ClientRedirectURL'); }
       break;
     case PAYMENT_METHOD.CVS:
       break;
