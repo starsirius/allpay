@@ -58,7 +58,9 @@ AllPay.prototype.validateCheckout = function(data) {
       'ChoosePayment'       // AllPay payment type
     ]
     , optional = {}
-    , omits = [];
+    , omits = []
+    , installment
+    , periodic;
 
     optional[PAYMENT_METHOD.ALL] = [
       'PlatformID',
@@ -72,7 +74,7 @@ AllPay.prototype.validateCheckout = function(data) {
       'IgnorePayment'
     ];
     optional[PAYMENT_METHOD.CREDIT] = [
-      // CREDIT specific (Non-periodic payments)
+      // CREDIT specific (Installment payments)
       'CreditInstallment',
       'InstallmentAmount',
       'Redeem',
@@ -139,7 +141,29 @@ AllPay.prototype.validateCheckout = function(data) {
       break;
 
     case PAYMENT_METHOD.CREDIT:
+      installment = [
+        'CreditInstallment',
+        'InstallmentAmount',
+        'Redeem',
+        'UnionPay'
+      ];
+      periodic = [
+        'PeriodAmount',
+        'PeriodType',
+        'Frequency',
+        'ExecTimes',
+        'PeriodReturnURL'
+      ];
+      if (_.any(_.map(installment, function(v) { return (v in data); })) &&
+         _.any(_.map(periodic, function(v) { return (v in data); }))) {
+        errors.push('Can not have both installment and periodic credit card options');
+        return errors;
+      }
+
+      data = _.pick(data, _.union(
+        required, optional[PAYMENT_METHOD.ALL], optional[PAYMENT_METHOD.CREDIT]));
       break;
+
     case PAYMENT_METHOD.WEB_ATM:
       break;
     case PAYMENT_METHOD.ATM:

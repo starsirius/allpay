@@ -291,5 +291,132 @@ describe('#validateCheckout', function() {
       });
 
     });
+
+    describe('Credit', function() {
+      beforeEach(function() {
+        required.ChoosePayment = 'Credit';
+      });
+
+      it('keeps all the required fields', function() {
+        var data, results;
+
+        creditOptions = {};
+        data = _.extend({}, required, creditOptions);
+        results = allPay.validateCheckout(data);
+
+        results.should.containEql(required);
+      });
+
+      it('returns errors if passed in both installment and periodic options', function() {
+        var data, results;
+        data = _.extend({}, required, _.pick(creditOptions, 'CreditInstallment', 'PeriodAmount'));
+        results = allPay.validateCheckout(data);
+
+        results.should.containEql('Can not have both installment and periodic credit card options');
+      });
+
+      it('keeps only installment credit card and ALL options besides required fields', function() {
+        var data, optional, results, expected;
+        optional = _.omit(allOptional, [
+          'PeriodAmount', 'PeriodType', 'Frequency', 'ExecTimes', 'PeriodReturnURL'
+        ]);
+        data = _.extend({}, required, optional);
+        expected = _.pick(data,
+          'MerchantID', 'MerchantTradeNo', 'MerchantTradeDate', 'PaymentType',
+          'TotalAmount', 'TradeDesc', 'ItemName', 'ReturnURL', 'ChoosePayment',
+          'PlatformID', 'ClientBackURL', 'ItemURL', 'Remark', 'ChooseSubPayment',
+          'OrderResultURL', 'NeedExtraPaidInfo', 'DeviceSource', 'IgnorePayment',
+          'CreditInstallment', 'InstallmentAmount', 'Redeem', 'UnionPay');
+        results = allPay.validateCheckout(data);
+
+        results.should.eql(expected);
+      });
+
+      it('keeps only periodic credit card and ALL options besides required fields', function() {
+        var data, optional, results, expected;
+        optional = _.omit(allOptional, [
+          'CreditInstallment', 'InstallmentAmount', 'Redeem', 'UnionPay'
+        ]);
+        data = _.extend({}, required, optional);
+        expected = _.pick(data,
+          'MerchantID', 'MerchantTradeNo', 'MerchantTradeDate', 'PaymentType',
+          'TotalAmount', 'TradeDesc', 'ItemName', 'ReturnURL', 'ChoosePayment',
+          'PlatformID', 'ClientBackURL', 'ItemURL', 'Remark', 'ChooseSubPayment',
+          'OrderResultURL', 'NeedExtraPaidInfo', 'DeviceSource', 'IgnorePayment',
+          'PeriodAmount', 'PeriodType', 'Frequency', 'ExecTimes', 'PeriodReturnURL')
+        results = allPay.validateCheckout(data);
+
+        results.should.eql(expected);
+      });
+    });
+
+    describe('WebATM', function() {
+      beforeEach(function() {
+        required.ChoosePayment = 'WebATM';
+      });
+
+      it('keeps all the required fields', function() {
+        var data, results;
+        data = _.extend({}, required, allOptional);
+        results = allPay.validateCheckout(data);
+
+        results.should.containEql(required);
+      });
+
+      it('keeps only Web ATM options besides required fields');
+    });
+
+    describe('ATM', function() {
+      beforeEach(function() {
+        required.ChoosePayment = 'ATM';
+      });
+
+      it('keeps all the required fields', function() {
+        var data, results;
+        data = _.extend({}, required, allOptional);
+        results = allPay.validateCheckout(data);
+
+        results.should.containEql(required);
+      });
+
+      it('keeps only ATM options besides required fields');
+    });
+
+    describe('CVS', function() {
+      beforeEach(function() {
+        required.ChoosePayment = 'CVS';
+      });
+
+      it('keeps all the required fields', function() {
+        var data, results;
+        data = _.extend({}, required, allOptional);
+        results = allPay.validateCheckout(data);
+
+        results.should.containEql(required);
+      });
+
+      it('keeps only Web ATM options besides required fields');
+    });
+
+    describe('BARCODE', function() {
+      beforeEach(function() {
+        required.ChoosePayment = 'BARCODE';
+      });
+
+      it('keeps all the required fields', function() {
+        var data, results;
+        data = _.extend({}, required, allOptional);
+        results = allPay.validateCheckout(data);
+
+        results.should.containEql(required);
+      });
+
+      it('keeps only Web ATM options besides required fields');
+    });
+
+    //describe('Alipay');
+    //describe('Tenpay');
+    //describe('TopUpUsed');
+
   });
 });
