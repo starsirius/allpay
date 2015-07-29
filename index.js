@@ -29,10 +29,11 @@ function AllPay(options) {
   _.each(_.extend(defaults, options), function(v, k) { instance[k] = v; });
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent
 AllPay.prototype.genCheckMacValue = function(data) {
   var pairs = Object
     .keys(data)
-    .sort(function(a, b) {
+    .sort(function(a, b) {  // case insensitive
       if (a.toLowerCase() > b.toLowerCase()) { return  1; }
       if (a.toLowerCase() < b.toLowerCase()) { return -1; }
       return 0;
