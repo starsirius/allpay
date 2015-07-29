@@ -1,5 +1,5 @@
 var _ = require('underscore')
-  , md5 = require('MD5')
+  , md5 = require('md5')
   , PAYMENT_METHOD = {
     ALL: 'ALL',
     CREDIT: 'Credit',
