@@ -25,6 +25,6 @@
     "underscore": "*"
   },
   "dependencies": {
-    "MD5": "^1.2.1"
+    "md5": "^2.0.0"
   }
 }
