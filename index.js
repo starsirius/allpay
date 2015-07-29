@@ -32,14 +32,20 @@ function AllPay(options) {
 AllPay.prototype.genCheckMacValue = function(data) {
   var pairs = Object
     .keys(data)
-    .sort()
+    .sort(function(a, b) {
+      if (a.toLowerCase() > b.toLowerCase()) { return  1; }
+      if (a.toLowerCase() < b.toLowerCase()) { return -1; }
+      return 0;
+    })
     .map(function(v) { return v + "=" + (data[v] || ''); });
 
   pairs.unshift("HashKey=" + this.hashKey);
   pairs.push("HashIV=" + this.hashIV);
 
   queryString = pairs.join("&");
-  uriEncoded = encodeURIComponent(queryString).replace(/%20/g, '+');
+  uriEncoded = encodeURIComponent(queryString)
+    .replace(/%20/g, '+')
+    .replace(/[']/g, function(c) { return '%' + c.charCodeAt(0).toString(16); });
 
   return md5(uriEncoded.toLowerCase()).toUpperCase();
 };

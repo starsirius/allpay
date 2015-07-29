@@ -30,23 +30,88 @@ describe('#initialization', function() {
 });
 
 describe('#genCheckMacValue', function() {
-  it('generates correct Check Mac Value', function() {
-    var allPay = new AllPay({
-      hashKey: 'xdfaefasdfasdfa32d',
-      hashIV: 'sdfxfafaeafwexfe'
-    }),
+  beforeEach(function() {
+    this.allPay = new AllPay({
+      hashKey: '5294y06JbISpM5x9',
+      hashIV: 'v77hoKGq4kWxNNIS'
+    });
+  });
+
+  it('generates correct CheckMacValue for unicode data', function() {
     data = {
-      ItemName: 'sdfasdfa',
-      MerchantID: '12345678',
+      ItemName: '喬丹十一代〉',
+      MerchantID: '2000132',
       MerchantTradeDate: '2013/03/12 15:30:23',
       MerchantTradeNo: 'allpay_1234',
       PaymentType: 'allpay',
-      ReturnURL: 'http:sdfasdfa',
+      ReturnURL: 'http://sdfasdfa',
       TotalAmount: '500',
       TradeDesc: 'dafsdfaff'
     }
 
-    allPay.genCheckMacValue(data).should.equal('40D9A6C00A4A78A300ED458237071BDA');
+    this.allPay.genCheckMacValue(data).should.equal('728F831730B3949CA99CAF0DE06B4C78');
+  });
+
+  it('generates correct CheckMacValue for data with mixed case keys', function() {
+    data = {
+      ItemName: '喬丹十一代〉',
+      MerchantID: '2000132',
+      MerchantTradeDate: '2013/03/12 15:30:23',
+      MerchantTradeNo: 'allpay_1234',
+      PaymentType: 'allpay',
+      ReturnURL: 'http://sdfasdfa',
+      TotalAmount: '500',
+      TradeDesc: 'dafsdfaff',
+      lowercase: 'breaker'
+    }
+
+    this.allPay.genCheckMacValue(data).should.equal('729F1C26159644E638CB641FD1CF94F2');
+  });
+
+  it('generates correct CheckMacValue for data with special character keys/values', function() {
+    data = {
+      ItemName: '喬丹十一代〉',
+      MerchantID: '2000132',
+      MerchantTradeDate: '2013/03/12 15:30:23',
+      MerchantTradeNo: 'allpay_1234',
+      PaymentType: 'allpay',
+      ReturnURL: 'http://sdfasdfa',
+      TotalAmount: '500',
+      '*': '***',
+      '(notes)': '((()))',
+      '!!!': '!!!!!!',
+      "'": "'''",
+      TradeDesc: 'dafsdfaff',
+      lowercase: 'breaker',
+      'das-h': '--dash--',
+      _underscore: 'under__score'
+    }
+
+    this.allPay.genCheckMacValue(data).should.equal('49C4F091610FE25090D3F6C8C0954DA3');
+  });
+
+  it('generates correct CheckMacValue for data with natural sorted keys', function() {
+    data = {
+      ItemName: '喬丹十一代〉',
+      MerchantID: '2000132',
+      MerchantTradeDate: '2013/03/12 15:30:23',
+      MerchantTradeNo: 'allpay_1234',
+      PaymentType: 'allpay',
+      ReturnURL: 'http://sdfasdfa',
+      TotalAmount: '500',
+      TradeDesc: 'dafsdfaff',
+      lowercase: 'breaker',
+      'das-h': '--dash--',
+      _underscore: 'under__score',
+      '*': '***',
+      '(notes)': '((()))',
+      '!!!': '!!!!!!',
+      "'": "'''",
+      a2: 'a2',
+      a10: 'a10'
+    }
+
+    this.allPay.genCheckMacValue(data).should.equal('ED1E6C80D6CC3576E14992F155E63F83');
   });
 });
 
