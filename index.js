@@ -1,5 +1,5 @@
 var _ = require('underscore')
-  , md5 = require('MD5')
+  , md5 = require('md5')
   , PAYMENT_METHOD = {
     ALL: 'ALL',
     CREDIT: 'Credit',
@@ -29,17 +29,24 @@ function AllPay(options) {
   _.each(_.extend(defaults, options), function(v, k) { instance[k] = v; });
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent
 AllPay.prototype.genCheckMacValue = function(data) {
   var pairs = Object
     .keys(data)
-    .sort()
+    .sort(function(a, b) {  // case insensitive
+      if (a.toLowerCase() > b.toLowerCase()) { return  1; }
+      if (a.toLowerCase() < b.toLowerCase()) { return -1; }
+      return 0;
+    })
     .map(function(v) { return v + "=" + (data[v] || ''); });
 
   pairs.unshift("HashKey=" + this.hashKey);
   pairs.push("HashIV=" + this.hashIV);
 
   queryString = pairs.join("&");
-  uriEncoded = encodeURIComponent(queryString).replace(/%20/g, '+');
+  uriEncoded = encodeURIComponent(queryString)
+    .replace(/%20/g, '+')
+    .replace(/[']/g, function(c) { return '%' + c.charCodeAt(0).toString(16); });
 
   return md5(uriEncoded.toLowerCase()).toUpperCase();
 };
